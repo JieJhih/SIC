@@ -85,10 +85,10 @@ var r = map[string]string{
 }
 
 func main() {
-	pass1()
-	pass2()
+	step1()
+	step2()
 
-	printob()
+	printResult()
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("Input op code: ")
@@ -105,7 +105,7 @@ func main() {
 
 }
 
-func pass1() {
+func step1() {
 	content, err := ioutil.ReadFile("file.txt")
 	if err != nil {
 		//Do something
@@ -132,7 +132,7 @@ func pass1() {
 			results = append(results, info)
 			break
 		} else if isop(lines[k]) {
-			info.op = lines[k] //optab(lines[k])
+			info.op = lines[k]
 			info.loc = tenTohex(loc_num)
 			loc_num += 3
 			if lines[k] != "RSUB" {
@@ -194,7 +194,7 @@ func pass1() {
 				}
 			} else if isop(lines[k]) {
 
-				info.op = lines[k] //optab(lines[k])
+				info.op = lines[k]
 				info.loc = tenTohex(loc_num)
 				loc_num += 3
 				k = k + 1
@@ -206,13 +206,13 @@ func pass1() {
 	}
 }
 
-func pass2() {
+func step2() {
 	for k := range results {
 		var temp string
 
 		if results[k].op == "START" {
 			results[k].obcode = ""
-		} else if optab(results[k].op) == "4C" {
+		} else if opMap(results[k].op) == "4C" {
 			results[k].obcode = "4C0000"
 		} else if results[k].op == "RESW" || results[k].op == "RESB" {
 			results[k].obcode = ""
@@ -223,7 +223,7 @@ func pass2() {
 			}
 
 		} else if results[k].parameter != "" {
-			results[k].obcode += optab(results[k].op)
+			results[k].obcode += opMap(results[k].op)
 			temp = results[k].parameter[len(results[k].parameter)-2 : len(results[k].parameter)]
 
 			if temp == ",X" {
@@ -258,7 +258,7 @@ func pass2() {
 	}
 }
 
-func optab(mnem string) string {
+func opMap(mnem string) string {
 
 	return r[mnem]
 }
@@ -333,7 +333,7 @@ func ASCII(li byte) string {
 	return fmt.Sprintf("%X", li)
 }
 
-func printob() {
+func printResult() {
 	fmt.Printf("%5s %20s %20s %20s %20s\n", "Loc", "Label", "Op", "operands", "Object Code\n")
 
 	for _, v := range results {
